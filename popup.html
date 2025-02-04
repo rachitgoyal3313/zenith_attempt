@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Zenith</title>
+  <style>
+    body {
+      width: 400px;
+      min-height: 400px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, system-ui, sans-serif;
+    }
+    
+    .header {
+      margin-bottom: 16px;
+    }
+    
+    .header h1 {
+      margin: 0;
+      color: #2563eb;
+      font-size: 24px;
+    }
+    
+    .search-container {
+      margin-bottom: 16px;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+    }
+    
+    .links-container {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .link-item {
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .link-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .link-url {
+      color: #6b7280;
+      font-size: 14px;
+      word-break: break-all;
+    }
+    
+    .link-date {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    
+    .delete-btn {
+      float: right;
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Zenith</h1>
+  </div>
+  
+  <div class="search-container">
+    <input type="text" class="search-input" placeholder="Search saved links...">
+  </div>
+  
+  <div class="links-container" id="linksContainer">
+    <!-- Links will be populated here -->
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

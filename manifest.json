@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "Zenith - Content Saver",
+    "version": "1.0",
+    "description": "Save links, posts, and embedded content with tags across the web",
+    "permissions": [
+      "storage",
+      "activeTab",
+      "scripting",
+      "contextMenus"
+    ],
+    "host_permissions": ["<all_urls>"],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "assets/save-icon.png",
+        "48": "assets/icon48.png",
+        "128": "assets/icon128.png"
+      }
+    },
+    "icons": {
+      "16": "assets/save-icon.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "css": ["content.css"]
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    }
+  }

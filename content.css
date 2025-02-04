@@ -1,0 +1,55 @@
+.zenith-save-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.zenith-inline-save {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+*:hover > .zenith-inline-save {
+  opacity: 1;
+}
+
+.zenith-inline-save img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Add more platform-specific styles as needed */
+.twitter-timeline .zenith-inline-save {
+  top: 4px;
+  right: 4px;
+}
+
+.instagram-media .zenith-inline-save {
+  top: 12px;
+  right: 12px;
+}
