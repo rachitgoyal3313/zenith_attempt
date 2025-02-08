@@ -19,37 +19,143 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 32px;
-  height: 32px;
-  background: white;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 24px;
+  height: 24px;
   cursor: pointer;
-  z-index: 99;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 100;
   opacity: 0;
   transition: opacity 0.2s;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-*:hover > .zenith-inline-save {
+/* Show on hover */
+*:hover > .zenith-inline-save,
+.zenith-inline-save:hover {
   opacity: 1;
 }
 
-.zenith-inline-save img {
-  width: 16px;
-  height: 16px;
+/* Platform-specific positioning */
+.feed-shared-update-v2,
+article,
+[data-testid="tweet"],
+[data-test-id="pin"],
+#video-title {
+  position: relative !important;
 }
 
-/* Add more platform-specific styles as needed */
-.twitter-timeline .zenith-inline-save {
+/* LinkedIn specific */
+.feed-shared-update-v2 {
+  position: relative !important;
+}
+
+.feed-shared-update-v2:hover .zenith-inline-save {
+  opacity: 1;
+}
+
+.feed-shared-update-v2 .zenith-inline-save {
+  top: 12px;
+  right: 12px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Twitter/X specific */
+[data-testid="tweet"] .zenith-inline-save {
   top: 4px;
   right: 4px;
 }
 
+h1.style-scope.ytd-watch-metadata {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+h1.style-scope.ytd-watch-metadata .zenith-inline-save {
+  position: relative !important;
+  top: unset !important;
+  right: unset !important;
+  margin-left: 8px !important;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+h1.style-scope.ytd-watch-metadata:hover .zenith-inline-save {
+  opacity: 1;
+}
+
+/* For video cards in search/recommendations */
+ytd-rich-item-renderer,
+ytd-compact-video-renderer {
+  position: relative !important;
+}
+
+ytd-rich-item-renderer .zenith-inline-save,
+ytd-compact-video-renderer .zenith-inline-save {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 2;
+}
+
+ytd-rich-item-renderer:hover .zenith-inline-save,
+ytd-compact-video-renderer:hover .zenith-inline-save {
+  opacity: 1;
+}
+
+/* Ensure save button doesn't overlap with video duration */
+ytd-thumbnail {
+  position: relative !important;
+}
+
+ytd-rich-item-renderer .zenith-inline-save {
+  margin-right: 24px !important;
+}
+
+/* Instagram specific */
 .instagram-media .zenith-inline-save {
   top: 12px;
   right: 12px;
+}
+
+/* Pinterest specific */
+[data-test-id="pin"] .zenith-inline-save {
+  top: 8px;
+  right: 8px;
+}
+
+/* YouTube specific */
+#video-title .zenith-inline-save {
+  top: 4px;
+  right: 4px;
+}
+
+/* Notification styles */
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
 }
