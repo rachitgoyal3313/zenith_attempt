@@ -1,3 +1,9 @@
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'refreshLinks') {
+    loadLinks();
+  }
+});
+
 // Constants for API endpoints
 const API_URL = 'http://localhost:3000/api'; // Change this to your backend URL
 
@@ -295,18 +301,10 @@ function hashPassword(password) {
   return hash.toString(36);
 }
 
-// Modified loadLinks to include auth check
 function loadLinks() {
-  chrome.storage.sync.get(['token'], (result) => {
-    if (!result.token || isTokenExpired(result.token)) {
-      handleLogout();
-      return;
-    }
-
-    chrome.storage.local.get(['links'], (result) => {
-      const links = result.links || [];
-      displayLinks(links);
-    });
+  chrome.storage.local.get(['links'], (result) => {
+    const links = result.links || [];
+    displayLinks(links);
   });
 }
 
@@ -319,91 +317,66 @@ function displayLinks(links) {
     return;
   }
 
-  links.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-
   links.forEach(link => {
     const linkElement = createLinkElement(link);
     container.appendChild(linkElement);
   });
 }
 
-// function createLinkElement(link) {
-//   const div = document.createElement('div');
-//   div.className = 'link-item';
-
-//   div.innerHTML = `
-//     <button class="delete-btn" data-url="${link.url}">🗑️</button>
-//     <div class="link-title">${link.title}</div>
-//     <div class="link-url">${link.url}</div>
-//     <div class="link-date">${new Date(link.dateAdded).toLocaleString()}</div>
-//   `;
-
-//   div.querySelector('.delete-btn').addEventListener('click', () => deleteLink(link.url));
-
-//   return div;
-// }
-
-
 function createLinkElement(link) {
   const div = document.createElement('div');
   div.className = 'link-item';
 
-  // Using a trash can SVG icon for better visibility and style
+  const favicon = link.favicon ?
+    `<img src="${link.favicon}" alt="" style="width: 16px; height: 16px; margin-right: 8px;">` : '';
+
   div.innerHTML = `
-    <button class="delete-btn" data-url="${link.url}" aria-label="Delete link">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
-           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 6h18"></path>
-        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-      </svg>
-    </button>
-    <div class="link-title">${link.title}</div>
-    <div class="link-url">${link.url}</div>
-    <div class="link-date">${new Date(link.dateAdded).toLocaleString()}</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div style="display: flex; align-items: flex-start; flex: 1;">
+        ${favicon}
+        <div style="flex: 1;">
+          <div class="link-title">${link.title}</div>
+          <div class="link-url">${link.url}</div>
+          <div class="link-date">${new Date(link.dateAdded).toLocaleString()}</div>
+        </div>
+      </div>
+      <button class="delete-btn" data-url="${link.url}" aria-label="Delete link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+        </svg>
+      </button>
+    </div>
   `;
 
-  // Add these styles to your CSS
-  const style = document.createElement('style');
-  style.textContent = `
-    .delete-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-      color: #6b7280;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  // Make the entire link item clickable
+  div.addEventListener('click', (e) => {
+    if (!e.target.closest('.delete-btn')) {
+      chrome.tabs.create({ url: link.url });
     }
-    
-    .delete-btn:hover {
-      background-color: #fee2e2;
-      color: #dc2626;
-    }
-    
-    .delete-btn svg {
-      display: block;
-    }
-  `;
-  document.head.appendChild(style);
+  });
 
-  div.querySelector('.delete-btn').addEventListener('click', () => deleteLink(link.url));
+  // Add delete button handler
+  div.querySelector('.delete-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    deleteLink(link.url);
+  });
 
   return div;
 }
 
 function deleteLink(url) {
-  chrome.storage.local.get(['links'], (result) => {
-    const links = result.links || [];
-    const updatedLinks = links.filter(link => link.url !== url);
+    chrome.storage.local.get(['links'], (result) => {
+        let links = result.links || [];
+        links = links.filter(link => link.url !== url);  // Filter out the link to be deleted
 
-    chrome.storage.local.set({ links: updatedLinks }, () => {
-      loadLinks();
+        chrome.storage.local.set({ links: links }, () => { // Set the updated links to the storage
+            loadLinks(); // Refresh the display
+        });
     });
-  });
 }
 
 function filterLinks(searchTerm) {
@@ -416,3 +389,14 @@ function filterLinks(searchTerm) {
     displayLinks(filteredLinks);
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLinks();
+
+  // Listen for refresh messages from background script
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'refreshLinks') {
+      loadLinks();
+    }
+  });
+});
