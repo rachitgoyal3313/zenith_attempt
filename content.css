@@ -23,18 +23,13 @@
   height: 24px;
   cursor: pointer;
   z-index: 100;
-  opacity: 0;
-  transition: opacity 0.2s;
+  /* Removed opacity: 0 to make it always visible */
+  opacity: 1;
+  transition: transform 0.2s;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.8);
   padding: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-/* Show on hover */
-*:hover > .zenith-inline-save,
-.zenith-inline-save:hover {
-  opacity: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* Platform-specific positioning */
@@ -49,10 +44,6 @@ article,
 /* LinkedIn specific */
 .feed-shared-update-v2 {
   position: relative !important;
-}
-
-.feed-shared-update-v2:hover .zenith-inline-save {
-  opacity: 1;
 }
 
 .feed-shared-update-v2 .zenith-inline-save {
@@ -81,11 +72,6 @@ h1.style-scope.ytd-watch-metadata .zenith-inline-save {
   top: unset !important;
   right: unset !important;
   margin-left: 8px !important;
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-}
-
-h1.style-scope.ytd-watch-metadata:hover .zenith-inline-save {
   opacity: 1;
 }
 
@@ -100,14 +86,8 @@ ytd-compact-video-renderer .zenith-inline-save {
   position: absolute !important;
   top: 8px !important;
   right: 8px !important;
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-  z-index: 2;
-}
-
-ytd-rich-item-renderer:hover .zenith-inline-save,
-ytd-compact-video-renderer:hover .zenith-inline-save {
   opacity: 1;
+  z-index: 2;
 }
 
 /* Ensure save button doesn't overlap with video duration */
@@ -143,6 +123,7 @@ ytd-rich-item-renderer .zenith-inline-save {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -154,6 +135,7 @@ ytd-rich-item-renderer .zenith-inline-save {
     transform: translateY(0);
     opacity: 1;
   }
+
   to {
     transform: translateY(20px);
     opacity: 0;
