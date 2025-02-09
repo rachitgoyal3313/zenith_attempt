@@ -44,7 +44,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/save-logo.png"
+        "assets/zenith_logo_alone.png"
       ],
       "matches": [
         "<all_urls>"
