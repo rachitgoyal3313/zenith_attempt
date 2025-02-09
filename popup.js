@@ -369,14 +369,14 @@ function createLinkElement(link) {
 }
 
 function deleteLink(url) {
-    chrome.storage.local.get(['links'], (result) => {
-        let links = result.links || [];
-        links = links.filter(link => link.url !== url);  // Filter out the link to be deleted
+  chrome.storage.local.get(['links'], (result) => {
+    let links = result.links || [];
+    links = links.filter(link => link.url !== url);  // Filter out the link to be deleted
 
-        chrome.storage.local.set({ links: links }, () => { // Set the updated links to the storage
-            loadLinks(); // Refresh the display
-        });
+    chrome.storage.local.set({ links: links }, () => { // Set the updated links to the storage
+      loadLinks(); // Refresh the display
     });
+  });
 }
 
 function filterLinks(searchTerm) {
