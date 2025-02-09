@@ -20,7 +20,7 @@ function injectSaveImage(postElement, link) {
       dateAdded: new Date().toISOString()
     };
 
-    chrome.runtime.sendMessage({action: 'save', data: linkData}, (response) => {
+    chrome.runtime.sendMessage({ action: 'save', data: linkData }, (response) => {
       if (response.success) {
         console.log('Link saved:', link);
         showNotification('Link saved to Zenith!');
@@ -46,7 +46,7 @@ function getTitle(postElement) {
     if (mainVideoTitle) {
       return mainVideoTitle.textContent.trim();
     }
-    
+
     // Check for video title in search results or recommendations
     const videoTitle = postElement.querySelector('#video-title');
     if (videoTitle) {
@@ -61,7 +61,7 @@ function getTitle(postElement) {
     if (textElement) {
       return textElement.textContent.trim();
     }
-    
+
     // Fallback for shared articles
     const articleTitle = postElement.querySelector('.feed-shared-article__title');
     if (articleTitle) {
@@ -88,13 +88,13 @@ function getTitle(postElement) {
 
 
 function getDescription(postElement) {
-    // YouTube specific description
+  // YouTube specific description
   if (window.location.hostname.includes('youtube.com')) {
     const description = document.querySelector('#description-inner');
     if (description) {
       return description.textContent.trim();
     }
-    
+
     // For video cards/thumbnails
     if (postElement.matches('#video-title')) {
       const videoDescription = postElement.closest('ytd-video-renderer')?.querySelector('#description-text');
@@ -111,7 +111,7 @@ function getDescription(postElement) {
     if (textElement) {
       return textElement.textContent.trim();
     }
-    
+
     // Fallback for shared articles
     const articleDesc = postElement.querySelector('.feed-shared-article__description');
     if (articleDesc) {
@@ -181,18 +181,18 @@ function detectAndInjectButtons() {
       }
     });
   }
-    // LinkedIn feed posts
+  // LinkedIn feed posts
   const linkedInPosts = document.querySelectorAll('.feed-shared-update-v2');
   linkedInPosts.forEach((post) => {
     if (!post.querySelector('.zenith-inline-save')) {
       let postLink = '';
-      
+
       // First try to get the post permalink
       const permalinkElement = post.querySelector('time[datetime]').closest('a');
       if (permalinkElement) {
         postLink = permalinkElement.href;
       }
-      
+
       // Fallback to article link if it's a shared article
       if (!postLink) {
         const articleElement = post.querySelector('.feed-shared-article__meta-link');
@@ -289,9 +289,9 @@ function injectGeneralSaveButton() {
   saveButton.className = 'zenith-save-button';
   saveButton.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+    <polyline points="17 21 17 13 7 13 7 21"></polyline>
          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-      <polyline points="17 21 17 13 7 13 7 21"></polyline>
       <polyline points="7 3 7 8 15 8"></polyline>
     </svg>
   `;
@@ -353,19 +353,38 @@ function injectSaveImage(postElement, link, videoData = null) {
   saveImage.src = chrome.runtime.getURL('assets/save-logo.png');
   saveImage.classList.add('zenith-inline-save');
 
-  saveImage.addEventListener('click', (event) => {
+  saveImage.addEventListener('click', async (event) => {
     event.stopPropagation();
     event.preventDefault();
 
-    const linkData = videoData || {
-      url: link,
-      title: getTitle(postElement),
-      description: getDescription(postElement),
-      favicon: getFaviconUrl(),
-      dateAdded: new Date().toISOString()
-    };
+    let linkData;
+    if (videoData) {
+      linkData = videoData;
+    } else {
+      // Fetch HTML content for title extraction
+      try {
+        const response = await fetch(link);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const htmlString = await response.text();
+        const title = getTitleFromHtml(htmlString);
 
-    chrome.runtime.sendMessage({action: 'save', data: linkData}, (response) => {
+        linkData = {
+          url: link,
+          title: title,
+          description: "", // You can add description extraction from HTML if needed
+          favicon: getFaviconUrl(),
+          dateAdded: new Date().toISOString()
+        };
+      } catch (error) {
+        console.error('Failed to fetch page content:', error);
+        showNotification('Failed to save link.', 'error');
+        return; // Exit if fetch fails
+      }
+    }
+
+    chrome.runtime.sendMessage({ action: 'save', data: linkData }, (response) => {
       if (response.success) {
         showNotification('Link saved to Zenith!');
       } else {
